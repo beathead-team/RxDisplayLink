@@ -31,9 +31,9 @@ public final class RxDisplayLink: ObservableType {
     private let runloop: RunLoop
     private let mode: RunLoop.Mode
     private let fps: Int
-    private var observer: AnyObserver<Element>?
+    private var observer: AnyObserver<CADisplayLink>?
 
-    @objc dynamic private func displayLinkHandler(link: Element) {
+    @objc dynamic private func displayLinkHandler(link: CADisplayLink) {
         observer?.onNext(link)
     }
 
@@ -43,16 +43,16 @@ public final class RxDisplayLink: ObservableType {
         self.fps = fps
     }
 
-    public func subscribe<O: ObserverType>(_ observer: O) -> Disposable where O.Element == Element {
-        var displayLink: Element? = Element(target: self, selector: #selector(displayLinkHandler))
+    public func subscribe<O: ObserverType>(_ observer: O) -> Disposable where O.Element == CADisplayLink {
+        var displayLink: CADisplayLink? = CADisplayLink(target: self, selector: #selector(displayLinkHandler))
         displayLink?.add(to: runloop, forMode: mode)
         if #available(iOS 10.0, tvOS 10.0, *) {
             displayLink?.preferredFramesPerSecond = fps
         } else {
-            displayLink?.frameInterval = max(Element.maximumFps / fps, 1)
+            displayLink?.frameInterval = max(CADisplayLink.maximumFps / fps, 1)
         }
 
-        self.observer = AnyObserver<Element>(observer)
+        self.observer = AnyObserver<CADisplayLink>(observer)
 
         return Disposables.create {
             self.observer = nil
