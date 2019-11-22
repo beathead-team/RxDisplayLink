@@ -1,1 +1,1 @@
-github "ReactiveX/RxSwift" ~> 4.0
+github "beathead-team/RxSwift" == 5.0.1
